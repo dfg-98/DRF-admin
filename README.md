@@ -1,4 +1,11 @@
-# DRF-Admin
+# This is a fork of [BdVade/DRF-admin](https://github.com/BdVade/DRF-admin) project
+
+This repo has been renamed in order to avoid confusions with BdVade/DRF-admin and will be
+mantained by myself. 
+
+Any contribution and feature requests are welcome!
+
+# dj-rest-admin
 A package to generate CRUD endpoints for registered models with the Django-REST Framework. 
 
 ## Requirements
