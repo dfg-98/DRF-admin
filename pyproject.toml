@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dj-rest-admin"
-version = "1.0.0"
+version = "1.0.1"
 description = "A package to generate CRUD endpoints for registered models with the Django-REST Framework."
 readme = "README.md"
 authors = [{ name = "Dario Fragas", email = "dariofg98@gmail.com" }]
