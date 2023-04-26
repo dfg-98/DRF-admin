@@ -32,3 +32,6 @@ dev = ["black", "bumpver", "isort", "pip-tools", "pytest"]
 [project.urls]
 Homepage = "https://github.com/dfg-98/dj-rest-admin"
 
+
+[tool.setuptools.packages.find]
+include = ["dj_rest_admin*"]  
