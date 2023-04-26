@@ -18,9 +18,11 @@ To install run:
 `pip install drf-admin`
 
 ## Usage
-- Import restadmin in the admin.py 
-- Call `restadmin.site.register(Model)` Model being the model to register 
-- Add rest admin to your urls.py file 
+- Add rest_admin.py in your app dirs for defining RestModelAdmin
+- Import dj_rest_admin in the rest_admin.py 
+- Call `dj_rest_admin.site.register(Model)` Model being the model to register 
+- Add rest admin to your urls.py file.
+- [Optional] Add `dj_rest_admin` to your `INSTALLED_APPS` for admin autodiscover.
 
 ## Prerequisite
 - rest_framework should be properly set up to use this package hitch free
@@ -56,9 +58,9 @@ class TestModel(models.Model):
 admin.py
 ```python
 from .models import TestModel
-import restadmin
+import dj_rest_admin
 
-restadmin.site.register(TestModel)
+dj_rest_admin.site.register(TestModel)
 ```
 urls.py
 ```python
@@ -83,7 +85,7 @@ This package allows you to specify the following when registering your model
 
 An example of how a call to the register method with all 3 would look is :
 ```python
-restadmin.site.register(TestModel, serializer_or_modeladmin=AdminSerializer, permission_classes=[ReadOnly], 
+dj_rest_admin.site.register(TestModel, serializer_or_modeladmin=AdminSerializer, permission_classes=[ReadOnly], 
                         pagination_class=LargeResultsSetPagination)
 
 ```
@@ -99,7 +101,7 @@ You can also register models with the `register` decorator
 
 Example:
 ```python
-from restadmin import register, RestModelAdmin
+from dj_rest_admin import register, RestModelAdmin
 from .models import TestModel
 
 @register(TestModel)
@@ -119,7 +121,7 @@ class TestRestModelAdmin(RestModelAdmin):
 A page to document the Endpoints generated can be accessed by adding the following to your base urls file
 
 ```python
-from restadmin import site
+from dj_rest_admin import site
 
 
 urlpatterns = [
