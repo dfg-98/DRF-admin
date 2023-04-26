@@ -1,22 +1,28 @@
-from rest_framework.test import APITestCase, override_settings, APIRequestFactory, URLPatternsTestCase
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAdminUser
-from rest_framework.settings import api_settings
-from rest_framework.serializers import ModelSerializer
-from tests.models import TestModel, TestAbstractModel, SecondTestModel
-from tests.serializers import AdminSerializer
-from tests.permissions import ReadOnly
-from tests.pagination import LargeResultsSetPagination
-from tests.restmodeladmin import TestRestModelAdmin, SecondTestRestModelAdmin
-from restadmin.sites import AdminSite, AlreadyRegistered, NotRegistered
-from restadmin import register, RestModelAdmin
-from django.core.exceptions import ImproperlyConfigured
-from django.urls import path, reverse
-from django.contrib.auth.models import User
-from django.template.response import TemplateResponse
-from django.test.client import RequestFactory
 import pdb
 
+from django.contrib.auth.models import User
+from django.core.exceptions import ImproperlyConfigured
+from django.template.response import TemplateResponse
+from django.test.client import RequestFactory
+from django.urls import path, reverse
+from rest_framework.permissions import IsAdminUser
+from rest_framework.serializers import ModelSerializer
+from rest_framework.settings import api_settings
+from rest_framework.test import (
+    APIRequestFactory,
+    APITestCase,
+    URLPatternsTestCase,
+    override_settings,
+)
+from rest_framework.viewsets import ModelViewSet
+
+from dj_rest_admin import RestModelAdmin, register
+from dj_rest_admin.sites import AdminSite, AlreadyRegistered, NotRegistered
+from tests.models import SecondTestModel, TestAbstractModel, TestModel
+from tests.pagination import LargeResultsSetPagination
+from tests.permissions import ReadOnly
+from tests.restmodeladmin import SecondTestRestModelAdmin, TestRestModelAdmin
+from tests.serializers import AdminSerializer
 
 # Create your tests here.
 
@@ -30,7 +36,9 @@ class TestRegistration(APITestCase):
         self.assertTrue(issubclass(self.site._registry[TestModel], ModelViewSet))
         viewset = self.site._registry[TestModel]
         self.site.unregister(TestModel)
-        registry_viewset_objects = [registry_object[0] for registry_object in self.site.admin_router.registry]
+        registry_viewset_objects = [
+            registry_object[0] for registry_object in self.site.admin_router.registry
+        ]
         self.assertFalse(viewset in registry_viewset_objects)
         self.assertEqual(self.site._registry, {})
 
@@ -65,7 +73,9 @@ class TestRegistration(APITestCase):
 
     def test_custom_serializer_registration(self):
         self.site.register(TestModel, serializer_or_modeladmin=AdminSerializer)
-        self.assertEqual(self.site._registry[TestModel].serializer_class, AdminSerializer)
+        self.assertEqual(
+            self.site._registry[TestModel].serializer_class, AdminSerializer
+        )
 
     def test_custom_permission_class_registration(self):
         self.site.register(TestModel, permission_classes=[ReadOnly])
@@ -73,19 +83,31 @@ class TestRegistration(APITestCase):
 
     def test_custom_pagination_class_registration(self):
         self.site.register(TestModel, pagination_class=LargeResultsSetPagination)
-        self.assertEqual(self.site._registry[TestModel].pagination_class, LargeResultsSetPagination)
+        self.assertEqual(
+            self.site._registry[TestModel].pagination_class, LargeResultsSetPagination
+        )
 
     def test_default_serializer_registration(self):
         self.site.register(TestModel)
-        self.assertEqual(self.site._registry[TestModel].serializer_class.__name__, 'TestModelSerializer')
+        self.assertEqual(
+            self.site._registry[TestModel].serializer_class.__name__,
+            "TestModelSerializer",
+        )
 
     def test_default_permission_class_registration(self):
-        self.site.register(TestModel, )
-        self.assertEqual(self.site._registry[TestModel].permission_classes, [IsAdminUser])
+        self.site.register(
+            TestModel,
+        )
+        self.assertEqual(
+            self.site._registry[TestModel].permission_classes, [IsAdminUser]
+        )
 
     def test_default_pagination_class_registration(self):
         self.site.register(TestModel)
-        self.assertEqual(self.site._registry[TestModel].pagination_class, api_settings.DEFAULT_PAGINATION_CLASS)
+        self.assertEqual(
+            self.site._registry[TestModel].pagination_class,
+            api_settings.DEFAULT_PAGINATION_CLASS,
+        )
 
     def test_restmodeladmin_registration(self):
         self.site.register(TestModel, TestRestModelAdmin)
@@ -96,13 +118,21 @@ class TestRegistration(APITestCase):
         # Add some data
         for i in [10, 20, 30, 40, 50, 60]:
             TestModel.objects.create(age=i, name=str(i))
-        self.assertQuerysetEqual(self.site._registry[TestModel].queryset, TestModel.objects.all(), ordered=False)
-        self.assertEqual(self.site._registry[TestModel].serializer_class.__name__, 'TestModelSerializer')
+        self.assertQuerysetEqual(
+            self.site._registry[TestModel].queryset,
+            TestModel.objects.all(),
+            ordered=False,
+        )
+        self.assertEqual(
+            self.site._registry[TestModel].serializer_class.__name__,
+            "TestModelSerializer",
+        )
 
     def test_register_decorator(self):
         @register(TestModel, site=self.site)
         class DecoratorRestModelAdmin(RestModelAdmin):
             pass
+
         self.assertEqual(self.site._registry[TestModel], DecoratorRestModelAdmin)
 
     def test_register_decorator_with_serializer(self):
@@ -111,24 +141,31 @@ class TestRegistration(APITestCase):
             class Meta:
                 model = TestModel
                 fields = ["id"]
-        
-        self.assertEqual(self.site._registry[TestModel].serializer_class, DecoratorSerializer)
+
+        self.assertEqual(
+            self.site._registry[TestModel].serializer_class, DecoratorSerializer
+        )
 
     def test_register_decorator_with_not_models(self):
         with self.assertRaises(ValueError):
+
             @register()
-            class Foo: pass
+            class Foo:
+                pass
 
     def test_register_decorator_with_invalid_admin_site(self):
         with self.assertRaises(ValueError):
+
             @register(TestModel, site=True)
-            class Foo: pass
+            class Foo:
+                pass
 
     def test_register_decorator_with_invalid_class(self):
         with self.assertRaises(ValueError):
-            @register(TestModel)
-            class Foo: pass
 
+            @register(TestModel)
+            class Foo:
+                pass
 
 
 site = AdminSite()
@@ -136,11 +173,7 @@ site.register(TestModel)
 
 register(SecondTestModel, site=site)(SecondTestRestModelAdmin)
 
-urlpatterns = [
-    path("test_admin/", site.urls),
-    path("admin-docs/", site.docs)
-
-]
+urlpatterns = [path("test_admin/", site.urls), path("admin-docs/", site.docs)]
 
 
 @override_settings(ROOT_URLCONF="tests.tests")
@@ -183,13 +216,11 @@ class TestViewSets(APITestCase):
         new_object = TestModel.objects.get(id=model_object.id)
         self.assertEqual(new_object.age, 15)
 
-
     def test_get_model_endpoint(self):
         model_object = TestModel.objects.create(name="name1", age=5)
         url = reverse("restadmin:admin_TestModel-detail", args=(1,))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-
 
     def test_delete_model_endpoint(self):
         model_object = TestModel.objects.create(name="name1", age=5)
@@ -206,7 +237,7 @@ class TestViewSets(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), 2)
-    
+
     def test_restmodeladmin_create_model_endpoint(self):
         url = reverse("restadmin:admin_SecondTestModel-list")
         response = self.client.post(url, data={"name": "name", "age": 16})
@@ -227,4 +258,3 @@ class TestViewSets(APITestCase):
         response = self.client.patch(url, data={"age": 15})
         new_object = SecondTestModel.objects.get(id=model_object.id)
         self.assertEqual(new_object.age, 15)
-        
