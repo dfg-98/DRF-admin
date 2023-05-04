@@ -35,3 +35,6 @@ Homepage = "https://github.com/dfg-98/dj-rest-admin"
 
 [tool.setuptools.packages.find]
 include = ["dj_rest_admin*"]  
+
+[tool.flake8]
+max-line-lenght=80

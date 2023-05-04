@@ -10,10 +10,10 @@ def register(*models, site=None):
     The `site` kwarg is an admin site to use instead of the default admin site.
     """
     from rest_framework.serializers import ModelSerializer
+
     from .restmodeladmin import RestModelAdmin
     from .sites import AdminSite
     from .sites import site as default_site
-    
 
     def _model_admin_wrapper(admin_class):
         if not models:
@@ -25,7 +25,9 @@ def register(*models, site=None):
             raise ValueError("site must subclass AdminSite")
 
         if not issubclass(admin_class, (RestModelAdmin, ModelSerializer)):
-            raise ValueError("Wrapped class must subclass RestModelAdmin or ModelSerializer.")
+            raise ValueError(
+                "Wrapped class must subclass RestModelAdmin or ModelSerializer."
+            )
 
         admin_site.register(models, serializer_or_modeladmin=admin_class)
 
